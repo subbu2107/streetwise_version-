@@ -410,11 +410,11 @@ def logout():
     session.clear()
     return redirect('/')
 
-@app.before_first_request
-def setup():
-    init_db()
+# Initialize database when app starts (safe for all environments)
+init_db()
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
 
