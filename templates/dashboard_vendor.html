@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vendor Dashboard - StreetWize</title>
+  
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    body {
+      background: #101010;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    nav {
+      background: #111;
+      padding: 10px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav h2 {
+      margin: 0;
+      color: #00cfff;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: bold;
+    }
+
+    main {
+      padding: 30px;
+    }
+
+    .search-container {
+      max-width: 800px;
+      margin: 30px auto;
+      display: flex;
+      background: #1f2937;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 207, 255, 0.2);
+    }
+
+    .search-container input {
+      flex: 1;
+      padding: 16px;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: white;
+    }
+
+    .search-container button {
+      padding: 0 24px;
+      background: linear-gradient(to right, #00cfff, #00b5ff);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .search-container button:hover {
+      background: linear-gradient(to right, #00b5ff, #009ecc);
+    }
+
+    .products-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 24px;
+    }
+
+    .product-card {
+      background: #1a1a1a;
+      width: 260px;
+      border-radius: 16px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(0, 207, 255, 0.3);
+    }
+
+    .image-wrapper {
+      width: 100%;
+      height: 160px;
+      overflow: hidden;
+      border-radius: 10px;
+    }
+
+    .image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .product-name {
+      font-weight: bold;
+      font-size: 18px;
+      color: #00cfff;
+      margin: 10px 0 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .product-name:hover {
+      text-decoration: underline;
+    }
+
+    .product-desc {
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .price {
+      font-size: 15px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .stock-badge {
+      font-size: 13px;
+      color: #eee;
+      background: #333;
+      padding: 4px 10px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .distance {
+      font-size: 13px;
+      color: #ff5f5f;
+      margin-bottom: 6px;
+    }
+
+    .rating {
+      font-size: 14px;
+      color: #ffd700;
+      margin-bottom: 10px;
+    }
+
+    .order-actions {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .order-actions a {
+      color: #00cfff;
+      font-size: 14px;
+      text-decoration: none;
+    }
+
+    .order-actions form {
+      display: flex;
+      gap: 6px;
+    }
+
+    .order-actions input[type="number"] {
+      flex: 1;
+      padding: 6px;
+      border: 1px solid #333;
+      border-radius: 6px;
+      background: #252525;
+      color: white;
+    }
+
+    .order-actions button {
+      padding: 6px 10px;
+      background: #00cfff;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+    }
+
+    .order-actions button:hover {
+      background: #00b5ff;
+    }
+
+    .card-section {
+      background: #111;
+      padding: 20px;
+      margin-top: 40px;
+      border-radius: 14px;
+      box-shadow: 0 0 10px rgba(0, 207, 255, 0.2);
+    }
+  </style>
+</head>
+
+<body>
+  <nav>
+    <h2>Welcome Vendor {{ name }}</h2>
+    <div>
+      <a href="/dashboard/vendor">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <main>
+    <form class="search-container" method="GET" action="/dashboard/vendor">
+      <input name="search" placeholder="Search for products..." value="{{ request.args.get('search', '') }}">
+      <button type="submit">Search</button>
+    </form>
+
+    <div class="products-grid">
+      {% for p in products %}
+      <div class="product-card">
+        <div class="image-wrapper" onclick="location.href='/product/{{ p[0] }}'">
+          <img src="/static/uploads/{{ p[6] }}" alt="{{ p[2] }}">
+        </div>
+        <div class="product-name" title="{{ p[2] }}" onclick="location.href='/product/{{ p[0] }}'">{{ p[2] }}</div>
+        <div class="product-desc" title="{{ p[3] }}">{{ p[3] }}</div>
+        <div class="price">₹{{ p[4] }} | Qty: {{ p[5] }}kg</div>
+        <div class="stock-badge">Stock: {{ p[5] }}kg</div>
+        {% if p[7] is not none %}
+        <div class="distance"><i class="fas fa-map-marker-alt"></i> {{ p[7]|round(2) }} km away</div>
+        {% endif %}
+        <div class="rating">
+  {% set rating_list = reviews | selectattr("0", "equalto", p[0]) | map(attribute="1") | list %}
+  {% if rating_list %}
+    {% set avg_rating = (rating_list | sum) / (rating_list | length) %}
+    <i class="fas fa-star"></i> {{ avg_rating | round(1) }}/5
+  {% else %}
+    <i class="fas fa-star"></i> No Ratings
+  {% endif %}
+</div>
+
+        <div class="order-actions">
+          <a href="/chat/{{ p[1] }}/{{ p[0] }}"><i class="fas fa-comment-dots"></i> Chat</a>
+          <form method="POST" action="/order/{{ p[0] }}">
+            <input name="quantity" type="number" min="1" max="{{ p[5] }}" placeholder="Qty" required>
+            <button type="submit"><i class="fas fa-shopping-cart"></i></button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="card-section">
+      <h3>My Orders</h3>
+      {% for oid, pid, qty, status, pname in my_orders %}
+      <p><strong>{{ pname }}</strong> - {{ qty }}kg - {{ status }}</p>
+      {% endfor %}
+    </div>
+  </main>
+
+  <script>
+    // Prevent redirect when clicking on form or inputs inside product cards
+    document.querySelectorAll('.order-actions form, .order-actions input').forEach(el => {
+      el.addEventListener('click', function(event) {
+        event.stopPropagation();
+      });
+    });
+  </script>
+</body>
+</html>

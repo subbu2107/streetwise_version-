@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>StreetWize | Supplier Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding-top: 70px;
+      background-color: #0e0e0e;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      color: #f5f5f5;
+    }
+
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #151515;
+      padding: 14px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    nav h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #00e0ff;
+      font-weight: 700;
+    }
+
+    nav a {
+      color: #f0f0f0;
+      margin-left: 25px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    nav a:hover {
+      color: #00e0ff;
+    }
+
+    main {
+      padding: 40px 6%;
+    }
+
+    h2.section-title {
+      color: #00e0ff;
+      margin-bottom: 20px;
+      border-left: 4px solid #00e0ff;
+      padding-left: 12px;
+    }
+
+    form.add-product {
+      background: #1a1a1a;
+      padding: 25px;
+      border-radius: 12px;
+      margin-bottom: 40px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    form.add-product input,
+    form.add-product textarea {
+      width: 100%;
+      background: #2c2c2c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 14px;
+      font-size: 15px;
+    }
+
+    form.add-product button {
+      background: #00e0ff;
+      color: #111;
+      font-weight: bold;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 5px;
+    }
+
+    .product-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .product-card {
+      background: #1e1e1e;
+      border-radius: 12px;
+      padding: 18px;
+      width: calc(20% - 20px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      transform: scale(1.02);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .product-card h3 {
+      font-size: 18px;
+      color: #00e0ff;
+      margin: 0 0 4px;
+    }
+
+    .product-card .price {
+      color: #0f0;
+      font-size: 16px;
+      font-weight: 600;
+      margin: 5px 0;
+    }
+
+    .product-card .qty {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+
+    .product-details {
+      display: none;
+      font-size: 14px;
+      margin-top: 8px;
+      color: #aaa;
+    }
+
+    .card-section {
+      background: #171717;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 30px;
+    }
+
+    .card-section p {
+      font-size: 15px;
+      padding: 6px 0;
+      color: #ccc;
+    }
+
+    .card-section a {
+      color: #00e0ff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    @media (max-width: 1024px) {
+      .product-card {
+        width: calc(33.33% - 20px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .product-card {
+        width: calc(50% - 20px);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .product-card {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <h1>StreetWize</h1>
+  <div>
+    <a href="/dashboard/supplier">Dashboard</a>
+    <a href="/logout">Logout</a>
+  </div>
+</nav>
+
+<main>
+  <h2 class="section-title">Welcome, Supplier {{ name }} 👋</h2>
+  
+
+  <form method="POST" enctype="multipart/form-data" class="add-product">
+    <h2 class="section-title">Add New Product</h2>
+    <input name="product_name" placeholder="Product Name" required>
+    <textarea name="description" placeholder="Short Description"></textarea>
+    <input name="price" type="number" placeholder="Price ₹" required>
+    <input name="quantity" type="number" placeholder="Quantity (kg)" required>
+    <input name="image" type="file" required>
+    <button type="submit">+ Add Product</button>
+  </form>
+
+  <h2 class="section-title">Your Product Listings</h2>
+  <div class="product-grid">
+    {% for p in products %}
+    <div class="product-card" onclick="toggleDetails(this)">
+      <img src="/static/uploads/{{ p[6] }}" alt="Product Image">
+      <h3>{{ p[2] }}</h3>
+      <div class="price">₹{{ p[4] }}</div>
+      <div class="qty">Stock: {{ p[5] }}kg</div>
+      <div class="product-details">
+        <p><strong>Description:</strong> {{ p[3] }}</p>
+        <p><strong>Product ID:</strong> {{ p[0] }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="card-section">
+    <h2 class="section-title">Pending Orders</h2>
+    {% for oid, vendor, pid, qty, pname in pending_orders %}
+      <p>📦 <strong>{{ vendor }}</strong> ordered <strong>{{ qty }}kg</strong> of <strong>{{ pname }}</strong>
+         <form action="/accept_order/{{ oid }}" method="post" style="display:inline;">
+           <button style="background:#00e0ff; color:#111; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;" type="submit">Accept</button>
+         </form>
+         <form action="/reject_order/{{ oid }}" method="post" style="display:inline; margin-left: 8px;">
+           <button style="background:#ff0044; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;" type="submit">Reject</button>
+         </form>
+      </p>
+    {% endfor %}
+  </div>
+
+  <div class="card-section">
+    <h2 class="section-title">Completed Orders</h2>
+    {% for oid, vendor, supplier, pid, qty, status in completed_orders %}
+      <p>✅ <strong>{{ vendor }}</strong> - {{ qty }}kg of product #{{ pid }} → <em>{{ status }}</em></p>
+    {% endfor %}
+  </div>
+
+  <div class="card-section">
+    <h2 class="section-title">Chats from Vendors</h2>
+    {% for (sender, pid), pname in chat_lookup.items() %}
+      <p>💬 <a href="/chat/{{ sender }}/{{ pid }}">Chat with {{ sender }} about "{{ pname }}"</a></p>
+    {% endfor %}
+  </div>
+</main>
+
+<script>
+  function toggleDetails(card) {
+    const details = card.querySelector('.product-details');
+    details.style.display = (details.style.display === 'block') ? 'none' : 'block';
+  }
+</script>
+
+</body>
+</html>

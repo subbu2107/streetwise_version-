@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Supplier Reviews - {{ supplier_name }}</title>
+  <style>
+    body {
+      background: #101010;
+      color: white;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 30px;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 12px;
+    }
+    h2 {
+      margin-top: 0;
+      color: #00cfff;
+    }
+    .review {
+      background: #2a2a2a;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .review strong {
+      color: #00cfff;
+    }
+    form {
+      margin-top: 30px;
+    }
+    textarea, input[type="number"] {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      margin-bottom: 10px;
+      background: #333;
+      color: white;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      background: #00cfff;
+      color: white;
+      cursor: pointer;
+    }
+    a {
+      color: #ccc;
+      display: inline-block;
+      margin-top: 20px;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Reviews for Supplier: {{ supplier_name }}</h2>
+
+    {% if reviews %}
+      {% for r in reviews %}
+        <div class="review">
+          <strong>{{ r[0] }}</strong> rated {{ r[1] }}/5<br>
+          <p>{{ r[2] }}</p>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p>No reviews yet for this supplier.</p>
+    {% endif %}
+
+    {% if session['role'] == 'vendor' %}
+    <form method="POST">
+      <h4>Add Your Review</h4>
+      <input type="number" name="rating" min="1" max="5" placeholder="Rating (1 to 5)" required>
+      <textarea name="review" placeholder="Write your review about the supplier..." required></textarea>
+      <button type="submit">Submit Review</button>
+    </form>
+    {% endif %}
+
+    <a href="/dashboard/{{ session['role'] }}">← Back to Dashboard</a>
+  </div>
+</body>
+</html>

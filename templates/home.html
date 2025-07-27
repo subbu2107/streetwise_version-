@@ -1,0 +1,603 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>StreetWize - Connected Supply Chain</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin : 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #fff;
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
+
+    #stars {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: transparent url('https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif') repeat top center;
+      background-size: cover;
+      opacity: 0.08;
+      z-index: -1;
+      pointer-events: none;
+    }
+    #loginModal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.85);
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  background: #121212;
+  padding: 35px;
+  border-radius: 14px;
+  width: 360px;
+  box-shadow: 0 0 18px rgba(0, 255, 255, 0.15);
+  color: white;
+  position: relative;
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #00e6e6;
+}
+
+.login-card input,
+.login-card select,
+.login-card button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: none;
+  background-color: #1f1f1f;
+  color: #eee;
+  font-size: 14px;
+}
+
+.login-card button {
+  background-color: #00e6e6;
+  color: #000;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.toggle-link {
+  text-align: center;
+  margin-top: 10px;
+  color: #00e6e6;
+  cursor: pointer;
+}
+
+.toggle-link:hover {
+  text-decoration: underline;
+}
+
+.close-btn {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 26px;
+  color: #fff;
+  cursor: pointer;
+}
+.close-btn {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  font-size: 24px;
+  color: #00e6e6;
+  cursor: pointer;
+}
+
+
+    a {
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 60px 20px;
+    }
+
+    .section {
+      margin-bottom: 100px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .section-title h2 {
+      font-size: 40px;
+      color: #22d3ee;
+      font-weight: bold;
+    }
+
+    .section-title p {
+      color: #cbd5e1;
+      font-size: 18px;
+      margin-top: 8px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 50px;
+    }
+
+    .hero-text {
+      flex: 1;
+    }
+
+    .hero-text h1 {
+      font-size: 52px;
+      font-weight: bold;
+      line-height: 1.2;
+      margin-bottom: 20px;
+    }
+
+    .hero-text h1 span {
+      color: #22d3ee;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #000;
+      color: #ccc;
+    }
+
+    .footer {
+      background-color: #0f0f0f;
+      padding: 60px 30px 20px;
+    }
+
+    .footer-container {
+      display: flex;
+      flex-wrap: wrap;
+      max-width: 1200px;
+      margin: auto;
+      justify-content: space-between;
+      gap: 40px;
+    }
+
+    .footer-column {
+      flex: 1 1 200px;
+    }
+
+    .footer-logo {
+      color: #00e6e6;
+      font-size: 24px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-column p {
+      margin: 12px 0;
+      line-height: 1.6;
+    }
+
+    .social-icons {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .social-icons a {
+      width: 34px;
+      height: 34px;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      background-color: #1a1a1a;
+      color: #00e6e6;
+      font-size: 18px;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+
+    .social-icons a:hover {
+      background-color: #00e6e6;
+      color: #000;
+    }
+
+    .footer-column h4 {
+      color: #00e6e6;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .footer-column ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .footer-column ul li {
+      margin-bottom: 10px;
+    }
+
+    .footer-column ul li a {
+      color: #ccc;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .footer-column ul li a:hover {
+      color: #00e6e6;
+    }
+
+    .footer-contact p {
+      margin: 8px 0;
+      font-size: 14px;
+    }
+
+    .footer-bottom {
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+      padding-top: 20px;
+      border-top: 1px solid #1c1c1c;
+      margin-top: 40px;
+    }
+    .hero-text p {
+      font-size: 18px;
+      color: #cbd5e1;
+      margin-bottom: 30px;
+      max-width: 580px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 16px;
+    }
+
+    .buttons a {
+      padding: 12px 24px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: 0.3s ease;
+    }
+
+    .btn-primary {
+      background: #22d3ee;
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: #0ea5e9;
+    }
+
+    .btn-secondary {
+      border: 2px solid #22d3ee;
+      color: #22d3ee;
+    }
+
+    .btn-secondary:hover {
+      background: #22d3ee;
+      color: #000;
+    }
+
+    .hero-image {
+      flex: 1;
+      text-align: center;
+      
+    }
+
+    .hero-image img {
+     
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+       width: 400px;        /* or any fixed size */
+  height: 400px;
+  object-fit: cover;
+  border-radius: 50%;
+    }
+
+    .features-grid,
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+
+    .feature-card,
+    .benefit-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: left;
+      transition: 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-card:hover,
+    .benefit-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      border-color: #22d3ee;
+      box-shadow: 0 10px 24px rgba(0, 255, 255, 0.2);
+    }
+
+    .feature-card img,
+    .benefit-card img {
+      width: 32px;
+      margin-bottom: 16px;
+    }
+
+    .feature-card h3,
+    .benefit-card h4 {
+      color: #22d3ee;
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .feature-card p,
+    .benefit-card p {
+      color: #cbd5e1;
+      font-size: 15px;
+    }
+
+    @media (max-width: 900px) {
+      .hero {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .hero-text h1 {
+        font-size: 38px;
+      }
+
+      .hero-image img {
+        max-width: 300px;
+      }
+
+      .section-title h2 {
+        font-size: 28px;
+      }
+    }
+      nav {
+      background: #000;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav h1 {
+      margin: 0;
+      font-size: 26px;
+      color: #00e6e6;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    nav a {
+      margin-left: 20px;
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+      background: #00e6e6;
+      color: black;
+      padding: 8px 18px;
+      border-radius: 8px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <nav>
+    <h1>StreetWize</h1>
+    <a href="javascript:void(0);" onclick="openLogin()">Login</a>
+  </nav>
+  <!-- LOGIN MODAL -->
+<div id="loginModal">
+  <div class="login-card">
+    <div class="close-btn" onclick="closeLogin()">X</div>
+    <h2 id="form-title">Login</h2>
+    <form id="auth-form" method="POST" action="/login">
+      <input type="text" name="name" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <select name="role" required>
+        <option value="">Select Role</option>
+        <option value="vendor">Vendor</option>
+        <option value="supplier">Supplier</option>
+      </select>
+
+      <div class="extra-fields" style="display:none;">
+        <input type="text" name="street" placeholder="Street Name" data-required>
+        <input type="text" name="city" placeholder="City" data-required>
+        <input type="text" name="state" placeholder="State" data-required>
+        <input type="text" name="coordinates" placeholder="Latitude,Longitude (e.g., 12.9721,77.5937)" data-required>
+      </div>
+
+      <button type="submit">Login</button>
+    </form>
+    <div class="toggle-link" onclick="toggleForm()">Don't have an account? Register</div>
+  </div>
+</div>
+
+
+
+<div id="stars"></div>
+<div class="container">
+
+  <!-- Hero Section -->
+  <section class="section hero">
+    <div class="hero-text">
+      <h1><span>Revolutionizing</span><br>Supply Chains</h1>
+      <p>Local goods, one click away. Empowering vendors with seamless access to verified suppliers and real-time connections.</p>
+      <div class="buttons">
+  <a href="javascript:void(0);" class="btn-primary" onclick="openLogin()">Get Started Today</a>
+  <a href="#" class="btn-secondary">Learn More</a>
+</div>
+
+    </div>
+    <div class="hero-image">
+      <img src="{{ url_for('static', filename='uploads/vegetables.jpg') }}" alt="Street Food Supply">
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section">
+    <div class="section-title">
+      <h2>Why Choose StreetWize?</h2>
+      <p>Connecting street vendors with local suppliers for a thriving food ecosystem</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <img src="https://tse4.mm.bing.net/th/id/OIP.JCVU5zT0h_qxeNv4heghtgHaE8?rs=1&pid=ImgDetMain&o=7&rm=3" alt="Verified Icon" />
+        <h3>Verified Local Suppliers</h3>
+        <p>Say goodbye to uncertainty. All suppliers are verified and rated by real vendors.</p>
+      </div>
+      <div class="feature-card">
+        <img src="https://img.icons8.com/emoji/48/star-emoji.png" alt="Review Icon" />
+        <h3>Product Reviews</h3>
+        <p>Make better decisions by reading detailed reviews of every raw material offered.</p>
+      </div>
+      <div class="feature-card">
+        <img src="https://img.icons8.com/ios-filled/50/speech-bubble.png" alt="Chat Icon" />
+        <h3>Live Chat</h3>
+        <p>Directly interact with suppliers and clarify doubts before placing an order.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Benefits Section -->
+  <section class="section">
+    <div class="section-title">
+      <h2>Benefits of Using StreetWize</h2>
+      <p>Efficiency, transparency, and convenience at your fingertips</p>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card">
+        <h4>Real-Time Inventory</h4>
+        <p>Vendors can instantly view available materials and place orders without delays.</p>
+      </div>
+      <div class="benefit-card">
+        <h4>Cost Efficiency</h4>
+        <p>StreetWize minimizes overhead by connecting you directly to local sellers.</p>
+      </div>
+      <div class="benefit-card">
+        <h4>Data-Driven Insights</h4>
+        <p>Smart analytics help suppliers predict demand and optimize delivery schedules.</p>
+      </div>
+      <div class="benefit-card">
+        <h4>Inclusive Access</h4>
+        <p>Designed for low-end smartphones, even the smallest vendors can benefit.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+<footer class="footer">
+    <div class="footer-container">
+      <!-- Logo and About -->
+      <div class="footer-column">
+        <div class="footer-logo">🤝 StreetWize</div>
+        <p>Connecting street vendors with local suppliers for a thriving food ecosystem.</p>
+        
+      </div>
+
+      <!-- Quick Links -->
+      <div class="footer-column">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#">Home</a></li>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">How It Works</a></li>
+          <li><a href="#">Testimonials</a></li>
+        </ul>
+      </div>
+
+      <!-- Support -->
+      <div class="footer-column">
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Contact Us</a></li>
+        </ul>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="footer-column footer-contact">
+        <h4>Contact Info</h4>
+        <p>📧 support@streetwize.in</p>
+        <p>📞 +91 9363663228</p>
+        <p>📍 Tamil Nadu, India</p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      © 2025 StreetWize. All rights reserved.
+    </div>
+  </footer>
+<script>
+  let isLogin = true;
+  function openLogin() {
+    document.getElementById('loginModal').style.display = 'flex';
+  }
+  function closeLogin() {
+    document.getElementById('loginModal').style.display = 'none';
+  }
+  function toggleForm() {
+    const form = document.getElementById('auth-form');
+    const extraFields = document.querySelector('.extra-fields');
+    const title = document.getElementById('form-title');
+    const toggleText = document.querySelector('.toggle-link');
+    const submitButton = form.querySelector('button');
+    const additionalInputs = document.querySelectorAll('.extra-fields input');
+
+    if (isLogin) {
+      form.action = '/register';
+      extraFields.style.display = 'block';
+      title.textContent = 'Register';
+      submitButton.textContent = 'Register';
+      toggleText.textContent = 'Already have an account? Login';
+      additionalInputs.forEach(input => input.setAttribute('required', true));
+    } else {
+      form.action = '/login';
+      extraFields.style.display = 'none';
+      title.textContent = 'Login';
+      submitButton.textContent = 'Login';
+      toggleText.textContent = "Don't have an account? Register";
+      additionalInputs.forEach(input => input.removeAttribute('required'));
+    }
+    isLogin = !isLogin;
+  }
+</script>
+
+</body>
+</html>

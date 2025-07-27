@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat - StreetWize</title>
+  <style>
+    body {
+      background: #101010;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    nav {
+      background: #111;
+      padding: 12px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    nav h2 {
+      color: #00cfff;
+      margin: 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #1a1a1a;
+      border-radius: 12px;
+    }
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #00cfff;
+    }
+    .message {
+      margin: 10px 0;
+      padding: 12px;
+      border-radius: 10px;
+      max-width: 75%;
+    }
+    .from-me {
+      background: #00cfff33;
+      margin-left: auto;
+      text-align: right;
+    }
+    .from-them {
+      background: #2e2e2e;
+      margin-right: auto;
+      text-align: left;
+    }
+    .timestamp {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+    form {
+      display: flex;
+      margin-top: 20px;
+      gap: 10px;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      background: #2a2a2a;
+      border: none;
+      color: white;
+    }
+    button {
+      background: #00cfff;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <h2>StreetWize</h2>
+    <div>
+      <a href="/dashboard/{{ session['role'] }}">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <h3>Chat about: {{ product_name }}</h3>
+    {% for sender, message, timestamp in messages %}
+      <div class="message {% if sender == session['name'] %}from-me{% else %}from-them{% endif %}">
+        <strong>{{ sender }}</strong><br>
+        {{ message }}
+        <div class="timestamp">{{ timestamp }}</div>
+      </div>
+    {% endfor %}
+
+    <form method="POST">
+      <input type="text" name="message" placeholder="Type your message..." required>
+      <button type="submit">Send</button>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product Details - StreetWize</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" />
+
+  <style>
+    body {
+      background: #101010;
+      font-family: 'Segoe UI', sans-serif;
+      color: #eee;
+      margin: 0;
+      padding: 0 20px 50px;
+    }
+
+    nav {
+      background: #111;
+      padding: 14px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    nav h2 {
+      color: #00cfff;
+      margin: 0;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 20px;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #00cfff;
+    }
+
+    .card {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 14px;
+      max-width: 800px;
+      margin: 40px auto;
+      box-shadow: 0 0 12px rgba(0, 207, 255, 0.2);
+    }
+
+    .product-img {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin: 20px 0;
+      box-shadow: 0 0 8px rgba(0, 207, 255, 0.2);
+    }
+
+    .rating {
+      color: #ffd700;
+      font-size: 16px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #1f1f1f;
+      color: #eee;
+      font-size: 15px;
+      margin-bottom: 12px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 100px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #444;
+      background: #1f1f1f;
+      color: #eee;
+      font-size: 15px;
+      resize: vertical;
+      margin-bottom: 12px;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(to right, #00cfff, #009ecf);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    button:hover {
+      background: linear-gradient(to right, #00b5ff, #008fc4);
+    }
+
+    hr {
+      border: 1px solid #333;
+      margin: 30px 0;
+    }
+
+    .review {
+      border-top: 1px solid #333;
+      padding: 10px 0;
+    }
+
+    .review strong {
+      color: #00cfff;
+    }
+
+    .distance {
+      color: #ff5f5f;
+    }
+
+    .price {
+      color: #0f0;
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      .card {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <h2>StreetWize</h2>
+  <div>
+    {% if session.role == 'vendor' %}
+      <a href="/dashboard/vendor"><i class="fas fa-arrow-left"></i> Back to Vendor Dashboard</a>
+    {% elif session.role == 'supplier' %}
+      <a href="/dashboard/supplier"><i class="fas fa-arrow-left"></i> Back to Supplier Dashboard</a>
+    {% endif %}
+    <a href="/logout">Logout</a>
+  </div>
+</nav>
+
+<div class="card">
+  <h2>{{ product[2] }}</h2>
+  <p><em>By: <strong>{{ product[1] }}</strong></em></p>
+  <img src="/static/uploads/{{ product[6] }}" class="product-img" alt="Product Image">
+  <p>{{ product[3] }}</p>
+  <p class="price">Price: ₹{{ product[4] }} | Qty: {{ product[5] }}kg</p>
+
+  {% if distance %}
+    <p class="distance"><i class="fas fa-map-marker-alt"></i> {{ distance }} km away</p>
+  {% endif %}
+
+  {% if avg_rating %}
+    <p class="rating"><i class="fas fa-star"></i> Avg Rating: {{ avg_rating }}/5</p>
+  {% else %}
+    <p>No ratings yet.</p>
+  {% endif %}
+
+  <hr>
+
+  <h3>Leave a Review</h3>
+  <form method="POST">
+    <input type="number" name="rating" min="1" max="5" required placeholder="Your rating (1–5)">
+    <textarea name="review" placeholder="Write your review..." required></textarea>
+    <button type="submit"><i class="fas fa-paper-plane"></i> Submit Review</button>
+  </form>
+
+  <hr>
+
+  <h3>Customer Reviews</h3>
+  {% if reviews %}
+    {% for r in reviews %}
+      <div class="review">
+        <p><strong>{{ r[0] }}</strong> - ⭐ {{ r[1] }}/5</p>
+        <p>{{ r[2] }}</p>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p style="color:#999;">No reviews yet for this product.</p>
+  {% endif %}
+</div>
+
+</body>
+</html>
