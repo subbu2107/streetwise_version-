@@ -9,62 +9,66 @@ UPLOAD_FOLDER = 'static/uploads'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+# -------- Absolute DB Path --------
+DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app.db')
+
 # -------- DB Setup --------
 def init_db():
-    conn = sqlite3.connect('app.db')
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS vendors (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE,
-        password TEXT,
-        street TEXT,
-        city TEXT,
-        state TEXT,
-        location TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS suppliers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT UNIQUE,
-        password TEXT,
-        street TEXT,
-        city TEXT,
-        state TEXT,
-        location TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS products (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        supplier TEXT,
-        name TEXT,
-        description TEXT,
-        price REAL,
-        quantity INTEGER,
-        image TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        sender TEXT,
-        receiver TEXT,
-        product_id INTEGER,
-        message TEXT,
-        timestamp TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS orders (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        vendor TEXT,
-        supplier TEXT,
-        product_id INTEGER,
-        quantity INTEGER,
-        status TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS reviews (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        product_id INTEGER,
-        reviewer TEXT,
-        rating INTEGER,
-        review_text TEXT)''')
-    c.execute('''CREATE TABLE IF NOT EXISTS supplier_reviews (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        supplier_name TEXT,
-        reviewer TEXT,
-        rating INTEGER,
-        review_text TEXT)''')
-    conn.commit()
-    conn.close()
+    if not os.path.exists(DB_PATH):
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS vendors (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE,
+            password TEXT,
+            street TEXT,
+            city TEXT,
+            state TEXT,
+            location TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS suppliers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT UNIQUE,
+            password TEXT,
+            street TEXT,
+            city TEXT,
+            state TEXT,
+            location TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            supplier TEXT,
+            name TEXT,
+            description TEXT,
+            price REAL,
+            quantity INTEGER,
+            image TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            sender TEXT,
+            receiver TEXT,
+            product_id INTEGER,
+            message TEXT,
+            timestamp TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS orders (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            vendor TEXT,
+            supplier TEXT,
+            product_id INTEGER,
+            quantity INTEGER,
+            status TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            product_id INTEGER,
+            reviewer TEXT,
+            rating INTEGER,
+            review_text TEXT)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS supplier_reviews (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            supplier_name TEXT,
+            reviewer TEXT,
+            rating INTEGER,
+            review_text TEXT)''')
+        conn.commit()
+        conn.close()
 
 # -------- Utilities --------
 def haversine_distance(lat1, lon1, lat2, lon2):
@@ -74,6 +78,7 @@ def haversine_distance(lat1, lon1, lat2, lon2):
     a = math.sin(dlat/2)**2 + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(dlon/2)**2
     F = R * 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     return F*(1+0.30)
+
 def convert_coords(coord_str):
     try:
         lat_str, lon_str = coord_str.strip().split(',')
@@ -93,17 +98,17 @@ def convert_coords(coord_str):
         return coord_str  # fallback to original if parse fails
 
 # -------- Routes --------
+
 @app.route('/')
 def home():
     return render_template('home.html')
-
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         name, password, role = request.form['name'], request.form['password'], request.form['role']
         table = 'vendors' if role == 'vendor' else 'suppliers'
-        conn = sqlite3.connect('app.db')
+        conn = sqlite3.connect(DB_PATH)
         c = conn.cursor()
         c.execute(f"SELECT * FROM {table} WHERE name=? AND password=?", (name, password))
         user = c.fetchone()
@@ -112,11 +117,8 @@ def login():
             session['name'], session['role'] = name, role
             return redirect(f'/dashboard/{role}')
         else:
-             
-        # Redirect to homepage if invalid
             return redirect('/')
     return render_template('login.html')
-
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -126,7 +128,7 @@ def register():
     coords = data.get('coordinates', '')
     location = convert_coords(coords) if ',' in coords else ""
     table = 'vendors' if role == 'vendor' else 'suppliers'
-    conn = sqlite3.connect('app.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
     c.execute(f"SELECT * FROM {table} WHERE name=?", (name,))
     if c.fetchone():
@@ -143,15 +145,13 @@ def dashboard_vendor():
     if session.get('role') != 'vendor':
         return redirect('/')
 
-    conn = sqlite3.connect('app.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
-    # Get vendor location
     c.execute("SELECT location FROM vendors WHERE name=?", (session['name'],))
     vendor_loc = c.fetchone()[0]
     vlat, vlon = vendor_loc.split(',') if vendor_loc else (None, None)
 
-    # Get all products (with optional search)
     query = request.args.get('search', '')
     if query:
         c.execute("SELECT * FROM products WHERE name LIKE ?", (f'%{query}%',))
@@ -159,11 +159,9 @@ def dashboard_vendor():
         c.execute("SELECT * FROM products")
     products = c.fetchall()
 
-    # Get all reviews
     c.execute("SELECT product_id, rating FROM reviews")
     all_reviews = c.fetchall()
 
-    # Prepare enriched product list with distance
     enriched = []
     for p in products:
         pid, supplier, name, desc, price, qty, image = p
@@ -175,10 +173,8 @@ def dashboard_vendor():
             dist = round(haversine_distance(vlat, vlon, slat, slon), 2)
         enriched.append((pid, supplier, name, desc, price, qty, image, dist))
 
-    # Sort by proximity
     enriched.sort(key=lambda x: x[7] if x[7] is not None else float('inf'))
 
-    # Get orders for this vendor
     c.execute("""
         SELECT o.id, o.product_id, o.quantity, o.status, p.name 
         FROM orders o 
@@ -188,7 +184,6 @@ def dashboard_vendor():
     my_orders = c.fetchall()
 
     conn.close()
-
     return render_template('dashboard_vendor.html',
                            name=session['name'],
                            products=enriched,
@@ -200,9 +195,8 @@ def dashboard_supplier():
     if session.get('role') != 'supplier':
         return redirect('/')
 
-    conn = sqlite3.connect('app.db')
+    conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    supplier_name = session.get('username')     # Handle new product POST
     if request.method == 'POST' and 'product_name' in request.form:
         try:
             pname = request.form['product_name']
@@ -212,18 +206,15 @@ def dashboard_supplier():
             image = request.files['image']
             filename = secure_filename(image.filename)
             image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
             c.execute("INSERT INTO products (supplier, name, description, price, quantity, image) VALUES (?, ?, ?, ?, ?, ?)",
                       (session['name'], pname, desc, price, qty, filename))
             conn.commit()
         except Exception as e:
             print("Error while adding product:", e)
 
-    # Load products by this supplier
     c.execute("SELECT * FROM products WHERE supplier=?", (session['name'],))
     products = c.fetchall()
 
-    # Load pending orders
     c.execute("SELECT * FROM orders WHERE supplier=? AND status='pending'", (session['name'],))
     pending_orders_raw = c.fetchall()
     pending = []
@@ -231,15 +222,13 @@ def dashboard_supplier():
         try:
             pid_name = c.execute("SELECT name FROM products WHERE id=?", (o[3],)).fetchone()
             pname = pid_name[0] if pid_name else "Unknown"
-            pending.append((o[0], o[1], o[3], o[4], pname))    # id, vendor, supplier, product_id, product_name
+            pending.append((o[0], o[1], o[3], o[4], pname))
         except Exception as e:
             print("Pending order load error:", e)
 
-    # Load completed orders
     c.execute("SELECT * FROM orders WHERE supplier=? AND status='accepted'", (session['name'],))
     completed = c.fetchall()
 
-    # Chat list
     c.execute("SELECT DISTINCT sender, product_id FROM messages WHERE receiver=?", (session['name'],))
     chats = c.fetchall()
     chat_lookup = {}
@@ -247,10 +236,10 @@ def dashboard_supplier():
         pname = c.execute("SELECT name FROM products WHERE id=?", (pid,)).fetchone()
         if pname:
             chat_lookup[(sender, pid)] = pname[0]
-    # Compute average rating for all products by this supplier
+
     avg_rating = None
     if products:
-        product_ids = [str(p[0]) for p in products]  # product[0] = id
+        product_ids = [str(p[0]) for p in products]
         placeholders = ','.join(['?'] * len(product_ids))
         c.execute(f"SELECT rating FROM reviews WHERE product_id IN ({placeholders})", product_ids)
         ratings = [r[0] for r in c.fetchall()]
@@ -258,15 +247,14 @@ def dashboard_supplier():
             avg_rating = round(sum(ratings) / len(ratings), 1)
 
     conn.close()
-
     return render_template('dashboard_supplier.html',
                             name=session['name'],
-                            
                             products=products,
                             pending_orders=pending,
                             completed_orders=completed,
                             chat_lookup=chat_lookup,
                             avg_rating=avg_rating)
+
 
 
 @app.route('/order/<int:product_id>', methods=['POST'])
@@ -410,7 +398,7 @@ def logout():
     session.clear()
     return redirect('/')
 
-# Initialize database when app starts (safe for all environments)
+# -------- Initialize DB Once --------
 init_db()
 
 if __name__ == '__main__':
