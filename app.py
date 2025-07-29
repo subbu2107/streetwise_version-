@@ -398,8 +398,7 @@ def logout():
     session.clear()
     return redirect('/')
 
-# -------- Initialize DB Once --------
-init_db()
+
 
 if __name__ == '__main__':
     app.run(debug=True)
